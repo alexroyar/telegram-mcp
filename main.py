@@ -86,9 +86,11 @@ SESSION_STRING = os.getenv("TELEGRAM_SESSION_STRING")
 
 # Validate session configuration
 if not SESSION_STRING and not TELEGRAM_SESSION_NAME:
-    print("WARNING: No session configuration found.", file=sys.stderr)
-    print("Set either TELEGRAM_SESSION_STRING or TELEGRAM_SESSION_NAME in .env", file=sys.stderr)
+    print("ERROR: No session configuration found.", file=sys.stderr)
+    print("You must set either TELEGRAM_SESSION_STRING or TELEGRAM_SESSION_NAME in .env", file=sys.stderr)
     print("Run session_string_generator.py to create a session string.", file=sys.stderr)
+    print("Or set TELEGRAM_SESSION_NAME to use file-based session.", file=sys.stderr)
+    sys.exit(1)
 
 mcp = FastMCP("telegram")
 
