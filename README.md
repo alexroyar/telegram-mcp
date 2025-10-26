@@ -551,7 +551,78 @@ The code is designed to be robust against common Telegram API issues and limitat
 
 ---
 
-## 🔒 Security Considerations
+## 🔒 Security & Privacy
+
+### Credential Security
+This application has been **security audited** for proper credential handling. See [SECURITY_AUDIT.md](SECURITY_AUDIT.md) for full details.
+
+**✅ What We Do:**
+- ✅ All credentials stored securely in environment variables (`.env` file)
+- ✅ Credentials used ONLY for Telegram API authentication
+- ✅ NO third-party services receive your credentials
+- ✅ NO external API calls except to official Telegram servers
+- ✅ All processing happens locally on your machine
+- ✅ Error messages never expose credentials
+- ✅ Credentials never logged to files or console
+
+**🔐 Critical Security Guidelines:**
+
+1. **Never Commit Credentials**
+   - Your `.env` file is in `.gitignore` - keep it that way
+   - Never share your session string in public repositories, issues, or screenshots
+   - Session strings provide COMPLETE ACCESS to your Telegram account
+
+2. **Treat Session Strings as Passwords**
+   - Session strings are equivalent to your Telegram password
+   - Anyone with your session string can access your entire Telegram account
+   - Store them securely and rotate if compromised
+
+3. **Credential Usage**
+   - `TELEGRAM_API_ID` and `TELEGRAM_API_HASH`: Your app credentials from https://my.telegram.org/apps
+   - `TELEGRAM_SESSION_STRING`: Generated after authentication, provides persistent access
+   - All credentials are used exclusively with the official Telethon library
+   - Direct encrypted communication with Telegram API servers only
+
+4. **What This Application Does NOT Do**
+   - ❌ Does NOT send your credentials to any third-party services
+   - ❌ Does NOT store credentials outside environment variables
+   - ❌ Does NOT log sensitive information
+   - ❌ Does NOT expose credentials in error messages
+   - ❌ Does NOT transmit your data to external analytics or tracking services
+
+5. **Data Privacy**
+   - All Telegram messages and data stay between you and Telegram's servers
+   - MCP server runs locally on your machine
+   - Claude/Cursor interact with the server via local IPC (Inter-Process Communication)
+   - No telemetry or external reporting
+
+### Security Best Practices
+
+- **Regular Security Updates**: Keep dependencies updated
+  ```bash
+  uv sync --upgrade
+  ```
+
+- **Credential Rotation**: If you suspect your credentials are compromised:
+  1. Revoke your API credentials at https://my.telegram.org/apps
+  2. Generate a new session string with `session_string_generator.py`
+  3. Update your `.env` file
+
+- **Audit Your Configuration**: Ensure `.env` is not tracked by git
+  ```bash
+  git check-ignore .env  # Should output: .env
+  ```
+
+### Telegram API Rate Limits
+
+- Telegram enforces rate limits to prevent abuse
+- Excessive requests may temporarily restrict your account
+- The application handles rate limit errors gracefully
+- Use reasonable limits (e.g., max 20-50 messages per operation)
+
+---
+
+## 🔒 Security Considerations (Legacy)
 - **Never commit your `.env` or session string.**
 - The session string gives full access to your Telegram account—keep it safe!
 - All processing is local; no data is sent anywhere except Telegram's API.

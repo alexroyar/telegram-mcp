@@ -1,3 +1,18 @@
+"""
+Telegram MCP Server - Secure Telegram Integration for Claude and MCP Clients
+
+SECURITY NOTICE:
+This application handles sensitive Telegram credentials. Please ensure:
+1. Never commit your .env file or session strings to version control
+2. Session strings provide FULL ACCESS to your Telegram account - treat as passwords
+3. This application ONLY communicates with Telegram's official API servers
+4. NO data is sent to third-party services or external APIs
+5. All credentials are loaded from environment variables and never logged or exposed
+6. Credentials are used exclusively for Telegram API authentication via Telethon
+
+For security audit details, see SECURITY_AUDIT.md
+"""
+
 import os
 import sys
 import json
@@ -46,12 +61,36 @@ def json_serializer(obj):
 
 load_dotenv()
 
-TELEGRAM_API_ID = int(os.getenv("TELEGRAM_API_ID"))
+# Load and validate Telegram credentials from environment variables
+# These credentials are ONLY used for authentication with Telegram's official API
+# via the Telethon library. They are NEVER sent to any third-party services.
+TELEGRAM_API_ID = os.getenv("TELEGRAM_API_ID")
 TELEGRAM_API_HASH = os.getenv("TELEGRAM_API_HASH")
 TELEGRAM_SESSION_NAME = os.getenv("TELEGRAM_SESSION_NAME")
 
+# Validate required credentials
+if not TELEGRAM_API_ID or not TELEGRAM_API_HASH:
+    print("ERROR: Missing required Telegram credentials.", file=sys.stderr)
+    print("Please set TELEGRAM_API_ID and TELEGRAM_API_HASH in your .env file.", file=sys.stderr)
+    print("Get your credentials from: https://my.telegram.org/apps", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    TELEGRAM_API_ID = int(TELEGRAM_API_ID)
+except (ValueError, TypeError):
+    print("ERROR: TELEGRAM_API_ID must be a valid integer.", file=sys.stderr)
+    sys.exit(1)
+
 # Check if a string session exists in environment, otherwise use file-based session
 SESSION_STRING = os.getenv("TELEGRAM_SESSION_STRING")
+
+# Validate session configuration
+if not SESSION_STRING and not TELEGRAM_SESSION_NAME:
+    print("ERROR: No session configuration found.", file=sys.stderr)
+    print("You must set either TELEGRAM_SESSION_STRING or TELEGRAM_SESSION_NAME in .env", file=sys.stderr)
+    print("Run session_string_generator.py to create a session string.", file=sys.stderr)
+    print("Or set TELEGRAM_SESSION_NAME to use file-based session.", file=sys.stderr)
+    sys.exit(1)
 
 mcp = FastMCP("telegram")
 
