@@ -53,7 +53,7 @@ TELEGRAM_SESSION_NAME = os.getenv("TELEGRAM_SESSION_NAME")
 # Check if a string session exists in environment, otherwise use file-based session
 SESSION_STRING = os.getenv("TELEGRAM_SESSION_STRING")
 
-mcp = FastMCP("telegram")
+mcp = FastMCP("telegram", host="0.0.0.0", port=8000)
 
 if SESSION_STRING:
     # Use the string session if available
@@ -2632,9 +2632,9 @@ if __name__ == "__main__":
             print("Starting Telegram client...")
             await client.start()
 
-            print("Telegram client started. Running MCP server...")
-            # Use the asynchronous entrypoint instead of mcp.run()
-            await mcp.run_stdio_async()
+            print("Telegram client started. Running MCP server on HTTP port 8000...")
+            # Use SSE transport over HTTP instead of STDIO
+            mcp.run(transport="sse")
         except Exception as e:
             print(f"Error starting client: {e}", file=sys.stderr)
             if isinstance(e, sqlite3.OperationalError) and "database is locked" in str(e):
